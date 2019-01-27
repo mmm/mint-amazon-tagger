@@ -326,6 +326,9 @@ class Order:
         tax_rate_per_item = [
             round(i.item_subtotal_tax * 100.0 / i.item_subtotal, 1)
             for i in self.items]
+        print("Sales tax adjustment debugging:")
+        print(tax_diff)
+        from pprint import pprint
         while abs(tax_diff) > MICRO_USD_EPS:
             if abs(tax_diff) < CENT_MICRO_USD:
                 # If the difference is under a penny, round that
@@ -333,6 +336,7 @@ class Order:
                 adjust_amount = tax_diff
                 adjust_idx = 0
             elif tax_diff > 0:
+                print("Adding one penny of tax to lowest item...")
                 adjust_idx = None
                 min_rate = None
                 for (idx, rate) in enumerate(tax_rate_per_item):
@@ -340,12 +344,21 @@ class Order:
                         adjust_idx = idx
                         min_rate = rate
                 adjust_amount = CENT_MICRO_USD
+                # Try removing the leading hash for the lines below and see if that fixes your issue:
+                # if not adjust_idx:
+                #     adjust_idx = 0
             else:
+                print("Subtracking one penny of tax to highest taxed item...")
                 # Find the highest taxed item (by rate) and discount it
                 # a penny.
                 (adjust_idx, _) = max(
                     enumerate(tax_rate_per_item), key=lambda x: x[1])
                 adjust_amount = -CENT_MICRO_USD
+                
+            pprint(tax_rate_per_item)
+            pprint(adjust_idx)
+            pprint(min_rate)
+            pprint(adjust_amount)
 
             self.items[adjust_idx].item_subtotal_tax += adjust_amount
             self.items[adjust_idx].item_total += adjust_amount
