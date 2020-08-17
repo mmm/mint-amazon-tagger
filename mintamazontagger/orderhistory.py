@@ -35,7 +35,10 @@ def fetch_order_history(report_download_path, start_date, end_date,
     name = email.split('@')[0]
 
     report_shortnames = ['Items', 'Orders', 'Refunds']
-    report_names = ['{} {} from {:%d %b %Y} to {:%d %b %Y}'.format(
+    # report_names = ['{} {} from {:%d %b %Y} to {:%d %b %Y}'.format(
+    #                name, t, start_date, end_date)
+    #                for t in report_shortnames]
+    report_names = ['{}-{}-{:%Y%m%d}-{:%Y%m%d}'.format(
                     name, t, start_date, end_date)
                     for t in report_shortnames]
     report_types = ['ITEMS', 'SHIPMENTS', 'REFUNDS']
